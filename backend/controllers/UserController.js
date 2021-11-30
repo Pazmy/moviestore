@@ -49,14 +49,12 @@ class UserController {
             name: userResult.name,
             role: userResult.role,
           });
-          res
-            .status(200)
-            .json({
-              token,
-              email,
-              name: userResult.name,
-              role: userResult.role,
-            });
+          res.status(200).json({
+            token,
+            email,
+            name: userResult.name,
+            role: userResult.role,
+          });
         } else {
           throw { message: "Email or password is not correct" };
         }
@@ -67,6 +65,30 @@ class UserController {
       }
     } catch (error) {
       res.status(400).json(error);
+    }
+  }
+  static async editUser(req, res) {
+    //will update
+    try {
+      const id = +req.params.id;
+      const { name, email, password, gender } = req.body;
+      console.log(id, gender);
+      const data = await User.update(
+        { avatarpath: req.file.path, gender },
+        { where: { id } }
+      );
+      res.status(200).json({ message: "success", avatar: data.avatarpath });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
+  static async deleteUser(req, res) {
+    try {
+      const id = +req.params.id;
+      await User.destroy({ where: { id } });
+      res.status(200).json({ message: "success" });
+    } catch (error) {
+      res.status(500).json({ message: error });
     }
   }
 }

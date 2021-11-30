@@ -8,6 +8,14 @@ const productStorage = multer.diskStorage({
     cb(null, new Date().getTime() + "-" + file.originalname);
   },
 });
+const userStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images/avatar");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime() + "-" + file.originalname);
+  },
+});
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/jpg" ||
@@ -19,6 +27,7 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
+const upload = multer({ storage: userStorage, fileFilter: fileFilter });
 const uploads = multer({ storage: productStorage, fileFilter: fileFilter });
 
-module.exports = uploads;
+module.exports = { upload, uploads };
