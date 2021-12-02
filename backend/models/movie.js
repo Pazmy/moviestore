@@ -8,9 +8,9 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Movie.hasMany(models.Actor);
       Movie.belongsToMany(models.User, { through: models.Comment });
       Movie.belongsToMany(models.Genre, { through: models.MovieGenre });
+      Movie.belongsToMany(models.Actor, { through: models.MovieActor });
       // Movie.belongsToMany(models.Order,{through:models.MovieOrder})
     }
   }
@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       studio: DataTypes.STRING,
       duration: DataTypes.STRING,
       release: DataTypes.STRING,
-      genreId: DataTypes.INTEGER,
       rate: DataTypes.STRING,
       trailer: DataTypes.STRING,
       views: DataTypes.STRING,
