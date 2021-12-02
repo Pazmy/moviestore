@@ -23,9 +23,7 @@ module.exports = {
       release: {
         type: Sequelize.STRING,
       },
-      genreId: {
-        type: Sequelize.INTEGER,
-      },
+
       rate: {
         type: Sequelize.STRING,
       },
