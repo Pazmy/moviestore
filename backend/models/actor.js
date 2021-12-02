@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Actor.belongsTo(models.Movie);
+      Actor.belongsToMany(models.Movie, { through: models.MovieActor });
     }
   }
   Actor.init(
@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       gender: DataTypes.STRING,
       birthday: DataTypes.STRING,
       placeofbirth: DataTypes.STRING,
-      biography: DataTypes.STRING,
-      MovieId: DataTypes.INTEGER,
+      biography: DataTypes.TEXT,
+      image: DataTypes.STRING,
     },
     {
       sequelize,
