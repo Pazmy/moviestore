@@ -18,6 +18,25 @@ class GenreController {
       res.status(500).json({ message: error });
     }
   }
+  static async editGenre(req, res) {
+    try {
+      const id = +req.params.id;
+      const { genre } = req.body;
+      await Genre.update({ genre }, { where: { id } });
+      res.status(200).json({ message: "Update Success" });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
+  static async deleteGenre(req, res) {
+    try {
+      const id = +req.params.id;
+      await Genre.destroy({ where: { id } });
+      res.status(200).json({ message: "Delete Success" });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
 }
 
 module.exports = GenreController;
