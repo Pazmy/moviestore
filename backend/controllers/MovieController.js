@@ -35,9 +35,16 @@ class MovieController {
         poster,
         overview,
         status,
-        genres,
+        genresId,
       } = req.body;
-      await Movie.create({
+      const images = req.files;
+      if (!genresId) {
+        res.status(400).json("Genre must be checked");
+      }
+      if (!images) {
+        res.status(400).json("Need upload image");
+      }
+      const movie = await Movie.create({
         title,
         director,
         studio,
@@ -51,8 +58,25 @@ class MovieController {
         poster,
         overview,
         status,
+        poster: images[0].path,
+        image: images[1].path,
       });
-      res.status(200).json({ message: "Success created" });
+
+      if (Array.isArray(genresId)) {
+        genresId.forEach(async (genre) => {
+          await MovieGenre.create({
+            MovieId: movie.id,
+            GenreId: Number(genre),
+          });
+        });
+      } else {
+        await MovieGenre.create({
+          MovieId: movie.id,
+          GenreId: Number(genresId),
+        });
+      }
+
+      res.status(201).json({ message: "Success created" });
     } catch (error) {
       res.status(500).json({ message: error });
     }

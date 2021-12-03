@@ -5,6 +5,7 @@ const { upload } = require("../middleware/multer");
 
 const userRoute = require("express").Router();
 
+userRoute.get("/", UserController.getAllUsers);
 userRoute.post("/add", UserController.addUser);
 userRoute.post("/login", UserController.login);
 
