@@ -3,6 +3,14 @@ const { comparePwd } = require("../helper/bcrypt");
 const { generateAccessToken } = require("../helper/jwt");
 
 class UserController {
+  static async getAllUsers(req, res) {
+    try {
+      const data = await User.findAll();
+      res.status(200).json({ results: data });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
   static async addUser(req, res) {
     const { name, email, password, role } = req.body;
     try {
@@ -71,13 +79,13 @@ class UserController {
     //will update
     try {
       const id = +req.params.id;
-      const { name, email, password, gender } = req.body;
-      console.log(id, gender);
+      const { name, email, gender } = req.body;
+
       const data = await User.update(
-        { avatarpath: req.file.path, gender },
+        { avatarpath: req.file.path, gender, name, email },
         { where: { id } }
       );
-      res.status(200).json({ message: "success", avatar: data.avatarpath });
+      res.status(200).json({ message: "Edit Success", result: data });
     } catch (error) {
       res.status(500).json({ message: error });
     }
@@ -86,7 +94,7 @@ class UserController {
     try {
       const id = +req.params.id;
       await User.destroy({ where: { id } });
-      res.status(200).json({ message: "success" });
+      res.status(200).json({ message: "Delete Success" });
     } catch (error) {
       res.status(500).json({ message: error });
     }

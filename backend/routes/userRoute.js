@@ -9,11 +9,20 @@ userRoute.post("/add", UserController.addUser);
 userRoute.post("/login", UserController.login);
 
 userRoute.post("/admin/add", authenticateToken, admin, UserController.addUser);
+
+//implement later
 userRoute.put(
   "/edit/:id",
   authenticateToken,
   upload.single("avatar"),
   UserController.editUser
+);
+
+userRoute.delete(
+  "/admin/delete/:id",
+  authenticateToken,
+  admin,
+  UserController.deleteUser
 );
 
 module.exports = userRoute;
