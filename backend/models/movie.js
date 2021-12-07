@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       Movie.belongsToMany(models.User, { through: models.Comment });
       Movie.belongsToMany(models.Genre, { through: models.MovieGenre });
       Movie.belongsToMany(models.Actor, { through: models.MovieActor });
-      // Movie.belongsToMany(models.Order,{through:models.MovieOrder})
+      Movie.belongsToMany(models.Order, { through: models.MovieOrder });
     }
   }
   Movie.init(
