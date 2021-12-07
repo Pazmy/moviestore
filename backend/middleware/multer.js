@@ -16,6 +16,14 @@ const userStorage = multer.diskStorage({
     cb(null, new Date().getTime() + "-" + file.originalname);
   },
 });
+const actorStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images/actor");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime() + "-" + file.originalname);
+  },
+});
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/jpg" ||
@@ -28,6 +36,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 const upload = multer({ storage: userStorage, fileFilter: fileFilter });
+const uploadActor = multer({ storage: actorStorage, fileFilter: fileFilter });
 const uploads = multer({ storage: productStorage, fileFilter: fileFilter });
 
-module.exports = { upload, uploads };
+module.exports = { upload, uploads, uploadActor };
