@@ -1,6 +1,13 @@
-const { Movie, Genre, Actor, MovieGenre, MovieActor } = require("../models");
-const { URLBACKDROP, URLPOSTER, URLPERSON } = require("../helper/tmdbUrl");
-const axios = require("axios");
+const {
+  Movie,
+  Genre,
+  Actor,
+  MovieGenre,
+  MovieActor,
+  Comment,
+  User,
+} = require("../models");
+
 class MovieController {
   static async getAllMovies(req, res) {
     try {
@@ -10,10 +17,51 @@ class MovieController {
       res.status(500).json({ message: error });
     }
   }
+  static async getPopularMovies(req, res) {
+    try {
+      const data = await Movie.findAll({ limit: 10 });
+      res.status(200).json({ results: data });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
   static async getSingleMovie(req, res) {
     try {
       const id = +req.params.id;
-      const data = await Movie.findByPk(id);
+      let data = await Movie.findByPk(id);
+      let genres = await MovieGenre.findAll({
+        where: { MovieId: id },
+        include: [Genre],
+      });
+      let actors = await MovieActor.findAll({
+        where: { MovieId: id },
+        include: [Actor],
+      });
+      let comments = await Comment.findAll({
+        where: { MovieId: id },
+        include: [User],
+      });
+      // let allGenres = await Genre.findAll();
+      genres = genres.map((item) => {
+        return item.Genre.name;
+      });
+      actors = actors.map((actor) => {
+        return {
+          id: actor.Actor.id,
+          name: actor.Actor.name,
+          character: actor.character,
+          image: actor.Actor.image,
+        };
+      });
+      comments = comments.map((i) => {
+        const date = new Date(i.createdAt).toString().slice(0, 15);
+        return { comment: i.comment, rate: i.rate, date, user: i.User.name };
+      });
+
+      data.dataValues.genres = genres;
+      data.dataValues.actors = actors;
+      data.dataValues.comments = comments;
+
       res.status(200).json({ result: data });
     } catch (error) {
       res.status(500).json({ message: error });
