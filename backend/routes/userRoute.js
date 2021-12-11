@@ -10,17 +10,29 @@ userRoute.post("/add", UserController.addUser);
 userRoute.post("/login", UserController.login);
 
 userRoute.post("/admin/add", authenticateToken, admin, UserController.addUser);
-
-//implement later
-userRoute.put(
-  "/edit/:id",
+userRoute.get(
+  "/admin/dashboard",
   authenticateToken,
-  upload.single("avatar"),
-  UserController.editUser
+  admin,
+  UserController.getAdminDashboard
+);
+//implement later
+// userRoute.put(
+//   "/edit/:id",
+//   authenticateToken,
+//   upload.single("avatar"),
+//   UserController.editUser
+// );
+
+userRoute.put(
+  "/info/avatar",
+  authenticateToken,
+  upload.single("image"),
+  UserController.updateAvatar
 );
 
 userRoute.delete(
-  "/admin/delete/:id",
+  "/delete/:id",
   authenticateToken,
   admin,
   UserController.deleteUser

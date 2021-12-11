@@ -3,7 +3,7 @@ const { Order, MovieOrder, User, Movie } = require("../models");
 class OrderController {
   static async getAllOrder(req, res) {
     try {
-      const data = await Order.findAll();
+      const data = await Order.findAll({ order: [["createdAt", "ASC"]] });
 
       res.status(200).json({ results: data });
     } catch (error) {
@@ -26,9 +26,9 @@ class OrderController {
           OrderId: orderResult.id,
         });
       });
-      res.status(201).json({ message: "Success" });
+      res.status(201).json({ message: "Proceed success" });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: "Something went wrong", error });
     }
   }
   static async getUserOrders(req, res) {

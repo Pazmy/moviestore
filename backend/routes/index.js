@@ -9,7 +9,13 @@ router.use("/movies", movieRoute);
 const genreRoute = require("./genreRoute");
 router.use("/genres", genreRoute);
 
-// const orderRoute = require("./orderRoute");
-// router.use("/orders", orderRoute);
+const actorRoute = require("./actorRoute");
+router.use("/actors", actorRoute);
+
+const commentRoute = require("./commentRoute");
+router.use("/comments", commentRoute);
+
+const orderRoute = require("./orderRoute");
+router.use("/orders", orderRoute);
 
 module.exports = router;

@@ -5,7 +5,6 @@ class CommentController {
     let data = await Comment.findAll({ include: [User] });
     data = data.map((i) => {
       const date = i.createdAt.slice(0, 11);
-      console.log(date);
       return { comment: i.comment, rate: i.rate };
     });
   }

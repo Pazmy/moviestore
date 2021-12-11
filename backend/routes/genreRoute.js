@@ -3,6 +3,7 @@ const genreRoute = require("express").Router();
 
 genreRoute.get("/", GenreController.getAllGenre);
 genreRoute.post("/add", GenreController.addGenre);
+genreRoute.post("/filter", GenreController.filterByGenre);
 genreRoute.put("/edit/:id", GenreController.editGenre);
 genreRoute.delete("/delete/:id", GenreController);
 

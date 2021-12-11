@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Order, Movie, Comment, MovieOrder } = require("../models");
 const { comparePwd } = require("../helper/bcrypt");
 const { generateAccessToken } = require("../helper/jwt");
 
@@ -50,6 +50,7 @@ class UserController {
     console.log(req.body);
     try {
       const userResult = await User.findOne({ where: { email } });
+
       if (userResult) {
         if (comparePwd(password, userResult.password)) {
           const token = generateAccessToken({
@@ -57,9 +58,11 @@ class UserController {
             name: userResult.name,
             role: userResult.role,
           });
+
           res.status(200).json({
             token,
             email,
+            avatarpath: userResult.avatarpath,
             name: userResult.name,
             role: userResult.role,
           });
@@ -94,9 +97,49 @@ class UserController {
     try {
       const id = +req.params.id;
       await User.destroy({ where: { id } });
+      await Comment.destroy({ where: { UserId: id } });
+
+      let userOrdersId = await Order.findAll({ where: { UserId: id } });
+      let tempId = [];
+      userOrdersId.forEach((order) => {
+        tempId.push(order.id);
+      });
+      console.log(tempId);
+      tempId.forEach(async (OrderId) => {
+        await MovieOrder.destroy({ where: { OrderId } });
+      });
+      await Order.destroy({ where: { UserId: id } });
+
       res.status(200).json({ message: "Delete Success" });
     } catch (error) {
       res.status(500).json({ message: error });
+    }
+  }
+  static async updateAvatar(req, res) {
+    try {
+      const { email } = req.body;
+      await User.update({ avatarpath: req.file.path }, { where: { email } });
+      const result = await User.findOne({ where: { email } });
+
+      res.status(200).json({ message: "Update success", result });
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+  static async getAdminDashboard(req, res) {
+    try {
+      const totalOrder = await Order.findAll();
+      const totalMovie = await Movie.findAll();
+      const totalUser = await User.findAll();
+      const result = {
+        totalOrder: totalOrder.length,
+        totalMovie: totalMovie.length,
+        totalUser: totalUser.length,
+      };
+
+      res.status(200).json({ result });
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong", error });
     }
   }
 }

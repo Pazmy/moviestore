@@ -1,10 +1,19 @@
-const { Actor, MovieActor } = require("../models");
+const { Actor, MovieActor, Movie } = require("../models");
 
 class ActorController {
   static async getSingleActor(req, res) {
     try {
       const id = +req.params.id;
       const data = await Actor.findByPk(id);
+      let credits = await MovieActor.findAll({
+        where: { ActorId: id },
+        include: [Movie],
+      });
+      credits = credits.map((movie) => {
+        return movie.Movie;
+      });
+      data.dataValues.credits = credits;
+
       res.status(200).json({ result: data });
     } catch (error) {
       res.status(500).json({ message: error });
@@ -12,8 +21,15 @@ class ActorController {
   }
   static async addActor(req, res) {
     try {
-      const { MovieId, name, gender, birthday, placeofbirth, biography } =
-        req.body;
+      const {
+        MovieId,
+        name,
+        gender,
+        birthday,
+        placeofbirth,
+        biography,
+        character,
+      } = req.body;
       const image = req?.file;
       const actor = await Actor.create({
         name,
@@ -23,7 +39,7 @@ class ActorController {
         biography,
         image: image ? image.path : null,
       });
-      await MovieActor.create({ MovieId, ActorId: actor.id });
+      await MovieActor.create({ MovieId, ActorId: actor.id, character });
       res.status(201).json({ message: "success" });
     } catch (error) {
       res.status(500).json({ message: error });

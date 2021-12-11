@@ -40,6 +40,7 @@ class MovieController {
       let comments = await Comment.findAll({
         where: { MovieId: id },
         include: [User],
+        order: [["createdAt", "DESC"]],
       });
       // let allGenres = await Genre.findAll();
       genres = genres.map((item) => {
@@ -55,7 +56,13 @@ class MovieController {
       });
       comments = comments.map((i) => {
         const date = new Date(i.createdAt).toString().slice(0, 15);
-        return { comment: i.comment, rate: i.rate, date, user: i.User.name };
+        return {
+          comment: i.comment,
+          rate: i.rate,
+          date,
+          user: i.User.name,
+          avatarpath: i.User.avatarpath,
+        };
       });
 
       data.dataValues.genres = genres;
@@ -79,7 +86,6 @@ class MovieController {
         trailer,
         views,
         price,
-        image,
         poster,
         overview,
         status,
@@ -102,7 +108,6 @@ class MovieController {
         trailer,
         views,
         price,
-        image,
         poster,
         overview,
         status,
@@ -132,7 +137,10 @@ class MovieController {
   static async deleteMovie(req, res) {
     try {
       const id = +req.params.id;
+      await MovieGenre.destroy({ where: { MovieId: id } });
+      await MovieActor.destroy({ where: { MovieId: id } });
       await Movie.destroy({ where: { id } });
+
       res.status(200).json({ message: "Delete Success" });
     } catch (error) {
       res.status(500).json({ message: error });
@@ -142,7 +150,41 @@ class MovieController {
   static async editMovie(req, res) {
     try {
       const id = +req.params.id;
-    } catch (error) {}
+      const {
+        title,
+        director,
+        studio,
+        duration,
+        release,
+        rate,
+        trailer,
+        views,
+        price,
+        poster,
+        overview,
+        status,
+      } = req.body;
+      await Movie.update(
+        {
+          title,
+          director,
+          studio,
+          duration,
+          release,
+          rate,
+          trailer,
+          views,
+          price,
+          poster,
+          overview,
+          status,
+        },
+        { where: { id } }
+      );
+      res.status(200).json({ message: "Update success" });
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+    }
   }
 }
 
