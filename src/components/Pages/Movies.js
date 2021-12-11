@@ -25,12 +25,15 @@ const Right = styled.div`
   margin-left: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(156px, 156px));
-  grid-gap: 8px;
+  grid-column-gap: 8px;
+  grid-row-gap: 16px;
   grid-template-rows: repeat(auto-fill, 1fr);
 `;
 const Card = styled.div`
   display: flex;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  height: auto;
+  max-height: 350px;
   flex-direction: column;
   img {
     border-radius: 10px 10px 0 0;
@@ -86,8 +89,9 @@ const Genreitem = styled.div`
 const Movies = () => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
-  const [disabled, setDisabled] = useState(true);
+  // const [disabled, setDisabled] = useState(true);
   const [activeGenre, setActiveGenre] = useState([]);
+  // const [noResult, setNoResult] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -104,19 +108,16 @@ const Movies = () => {
     setLoading(false);
   }, []);
   function handlerPickGenre(e, genre) {
+    //pick only one genre for now
     e.target.classList.toggle("active");
     console.log(e.target.classList.contains("active"));
     let flag = e.target.classList.contains("active");
     if (flag) {
-      console.log(activeGenre);
-
       setActiveGenre(activeGenre.concat(genre));
-      console.log(activeGenre);
     } else {
       let temp = activeGenre.filter((data) => data !== genre);
       setActiveGenre(temp);
     }
-    console.log(e.target);
     // console.log(activeGenre);
     // if (activeGenre.length > 0) {
     //   setDisabled(false);
@@ -128,83 +129,101 @@ const Movies = () => {
   }
   function handlerFilterSearch() {
     if (activeGenre.length === 0) {
-      console.log("filter first");
-    } else {
-      Instance.post("/genres/filter", { data: activeGenre })
+      Instance.get("/movies/")
         .then((res) => {
-          console.log(res.data);
+          setMovies(res.data.results);
         })
-        .catch((err) => console.log(err.response));
+        .catch((err) => console.log(err.response?.data));
+    } else {
+      setLoading(true);
+      console.log(activeGenre);
+      if (activeGenre.length > 0) {
+        Instance.post("/genres/filter", { genres: activeGenre })
+          .then((res) => {
+            let results = res.data.results;
+            if (results.length > 0) {
+              setMovies(res.data.results);
+            } else {
+              console.log("gak ada");
+              // setNoResult("No result found");
+            }
+            setLoading(false);
+          })
+          .catch((err) => console.log(err.response));
+      }
+      setLoading(false);
     }
   }
-  if (loading)
+  if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Loader style={{ width: "100px", height: "100px" }} />
       </div>
     );
-  return (
-    <Container>
-      <Content>
-        <Left>
-          <FilterContainer>
-            <div className="top">
-              <span>Filter</span>
-              <IconButton>
-                <KeyboardArrowRightIcon />
-              </IconButton>
-            </div>
-            <GenreContainer>
-              <h3>Genres</h3>
-              <ul>
-                {genres.map((genre, i) => {
-                  return (
-                    <li key={i}>
-                      <Genreitem
-                        onClick={(e) => handlerPickGenre(e, genre.name)}
-                      >
-                        {genre.name}
-                      </Genreitem>
-                    </li>
-                  );
-                })}
-              </ul>
-            </GenreContainer>
-          </FilterContainer>
-          <Button
-            // disabled={disabled}
-            variant="contained"
-            onClick={handlerFilterSearch}
-          >
-            Search
-          </Button>
-        </Left>
-        <Right>
-          {movies.map((movie, i) => {
-            return (
-              <Card key={i}>
-                <Link
-                  to={`/movie/detail/${movie.id}`}
-                  style={{ display: "block" }}
-                >
-                  <img
-                    src={movie.poster}
-                    alt={movie.title}
-                    width="156"
-                    height="237"
-                  />
-                </Link>
-                <div className="bottom">
-                  <span>{movie.title}</span>
-                  <span>{formatter.format(movie.price)}</span>
-                </div>
-              </Card>
-            );
-          })}
-        </Right>
-      </Content>
-    </Container>
-  );
+  } else {
+    return (
+      <Container>
+        <Content>
+          <Left>
+            <FilterContainer>
+              <div className="top">
+                <span>Filter</span>
+                <IconButton>
+                  <KeyboardArrowRightIcon />
+                </IconButton>
+              </div>
+              <GenreContainer>
+                <h3>Genres</h3>
+                <ul>
+                  {genres?.map((genre, i) => {
+                    return (
+                      <li key={i}>
+                        <Genreitem
+                          onClick={(e) => handlerPickGenre(e, genre.name)}
+                        >
+                          {genre.name}
+                        </Genreitem>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </GenreContainer>
+            </FilterContainer>
+            <Button
+              // disabled={disabled}
+              variant="contained"
+              onClick={handlerFilterSearch}
+            >
+              Search
+            </Button>
+          </Left>
+          <Right>
+            {movies?.map((movie, i) => {
+              return (
+                <Card key={i}>
+                  <Link
+                    to={`/movie/detail/${movie?.id}`}
+                    style={{ display: "block" }}
+                  >
+                    <img
+                      src={movie?.poster}
+                      alt={movie?.title}
+                      width="156"
+                      height="237"
+                    />
+                  </Link>
+                  <div className="bottom">
+                    <span>{movie?.title}</span>
+                    <span>{formatter.format(movie?.price)}</span>
+                  </div>
+                </Card>
+              );
+            })}
+          </Right>
+        </Content>
+      </Container>
+    );
+  }
 };
 
 export default Movies;

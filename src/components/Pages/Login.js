@@ -60,8 +60,10 @@ const Login = () => {
         email,
         password,
       });
-      const { name, role, token } = response.data;
-      dispatch(login({ name, email: response.data.email, role, token }));
+      const { name, role, token, avatarpath } = response.data;
+      dispatch(
+        login({ name, email: response.data.email, role, token, avatarpath })
+      );
       setLoading(false);
       navigate("/");
       // if (response.data.status === "error") setErr(response.data.message);
@@ -96,7 +98,7 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           {err ? <ErrMsg>{err}</ErrMsg> : ""}
-          <Button onClick={handleClick} variant="contained">
+          <Button type="submit" onClick={handleClick} variant="contained">
             {loading ? <Loader></Loader> : "Login"}
           </Button>
         </FormWrapper>

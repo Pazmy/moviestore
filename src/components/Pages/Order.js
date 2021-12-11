@@ -5,6 +5,8 @@ import { Instance } from "../../helper/axios";
 
 const Container = styled.div`
   padding: 20px 26px;
+  min-height: 320px;
+
   h1 {
     margin-bottom: 10px;
   }

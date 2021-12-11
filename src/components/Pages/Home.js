@@ -1,26 +1,50 @@
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import topBg from "../../assets/top-bg.jpg";
+import midBg from "../../assets/middle-bg.jpg";
+import PopularContent from "../PopularContent/PopularContent";
+import UpcomingContent from "../UpcomingContent/UpcomingContent";
+import Section2 from "../Section2/Section2";
+
 const Container = styled.div`
   width: 100%;
   height: 100%;
 `;
 const MainContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: ${(props) =>
-    `linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)),url('${props.image}')`};
+  &.top {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: ${(props) =>
+      `linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.8)),url('${props.image}')`};
 
-  max-height: 500px;
-  min-height: 500px;
-  /* margin-top: -70px; */
-  background-repeat: no-repeat;
-  background-size: cover;
-  margin-bottom: 20px;
-  /* padding-bottom: 0; */
+    max-height: 500px;
+    min-height: 500px;
+    /* margin-top: -70px; */
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 20px;
+    /* padding-bottom: 0; */
+  }
+  &.mid {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: ${(props) =>
+      `linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('${props.image}')`};
+
+    max-height: 500px;
+    min-height: 500px;
+    /* margin-top: -70px; */
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    /* padding-bottom: 0; */
+  }
   h4 {
     font-size: 30px;
     font-weight: 700;
@@ -60,7 +84,7 @@ const MainContainer = styled.div`
 const Home = () => {
   return (
     <Container>
-      <MainContainer image={topBg}>
+      <MainContainer className="top" image={topBg}>
         <h4>Explore Thousands Of Hits</h4>
         <span>
           Buy and Watch your favorite series and movies with our special offer.
@@ -68,6 +92,16 @@ const Home = () => {
         <Link to="/register" className="text">
           CLAIM SPECIAL OFFER
         </Link>
+      </MainContainer>
+      <Section2 />
+      <PopularContent />
+      <UpcomingContent />
+      <MainContainer className="mid" image={midBg}>
+        <h4>Thousands of titles</h4>
+        <span style={{ padding: "0 60px 20px" }}>
+          Buy any movie from Moviz with great deals. Thousands of titles of
+          movie content from studios like Paramount, Lionsgate, MGM and more.
+        </span>
       </MainContainer>
     </Container>
   );

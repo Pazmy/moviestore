@@ -102,7 +102,7 @@ const Signup = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           {err ? <ErrMsg>{err}</ErrMsg> : ""}
-          <Button onClick={handleClick} variant="contained">
+          <Button type="submit" onClick={handleClick} variant="contained">
             {loading ? <Loader></Loader> : "Register"}
           </Button>
         </FormWrapper>

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { Instance } from "../../helper/axios";
+import { Instance, SERVER_URL } from "../../helper/axios";
 import { calcTime, formatter } from "../../helper/formatter";
-import defaultAvatar from "../../assets/default-avatar.png";
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import Loader from "../Loader/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../redux/cartRedux";
+import Avatar from "@mui/material/Avatar";
+import { useSnackbar } from "notistack";
 
 const Container = styled.div``;
 const Section1 = styled.div`
@@ -113,6 +114,7 @@ const UserRating = styled.div`
 `;
 const LeftRating = styled.div`
   display: flex;
+  padding: 10px 0;
 `;
 const RightRating = styled.div``;
 const LeftInfo = styled.div`
@@ -154,6 +156,16 @@ const AddToCart = styled.div`
     color: white;
   }
 `;
+const Trailer = styled.div`
+  width: 100%;
+  max-width: 780px;
+  height: 432px;
+  padding: 20px 26px;
+  iframe {
+    width: 100%;
+    height: 100%;
+  }
+`;
 
 const DetailMovie = ({ user }) => {
   const { id } = useParams();
@@ -168,6 +180,7 @@ const DetailMovie = ({ user }) => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.cart.products);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     Instance.get(`/movies/${id}`)
@@ -194,10 +207,10 @@ const DetailMovie = ({ user }) => {
       email: user.email,
     })
       .then((res) => {
-        console.log(res);
         if (res.status === 201) {
           setIsReviewed(true);
         }
+        window.location.reload();
       })
       .catch((err) => {
         console.log(err.response);
@@ -213,6 +226,7 @@ const DetailMovie = ({ user }) => {
           price: movie.price,
         })
       );
+      enqueueSnackbar("Added to cart", { variant: "success" });
     }
     setCheckout(true);
   }
@@ -261,6 +275,19 @@ const DetailMovie = ({ user }) => {
           </Text>
         </Content>
       </Section1>
+      {movie.trailer ? (
+        <Trailer>
+          <h2 style={{ marginBottom: "10px" }}>Trailer</h2>
+          <iframe
+            title={movie.name}
+            src={movie.trailer}
+            class="responsive-iframe"
+          ></iframe>
+        </Trailer>
+      ) : (
+        ""
+      )}
+
       <Section2>
         <h2>Actors</h2>
         <ActorsWrapper>
@@ -284,11 +311,10 @@ const DetailMovie = ({ user }) => {
         {user ? (
           <WriteReview>
             <LeftRating>
-              <img
-                src={defaultAvatar}
-                alt="avatar"
-                width="40px"
-                height="40px"
+              <Avatar
+                alt={user.name}
+                src={`${SERVER_URL}/${user?.avatarpath}`}
+                sx={{ width: 40, height: 40 }}
               />
               <LeftInfo>{user.name}</LeftInfo>
             </LeftRating>
@@ -321,15 +347,17 @@ const DetailMovie = ({ user }) => {
           return (
             <UserRating key={i}>
               <LeftRating>
-                <img
-                  src={defaultAvatar}
-                  alt="avatar"
-                  width="40px"
-                  height="40px"
+                <Avatar
+                  alt={review?.user}
+                  src={`${SERVER_URL}/${review?.avatarpath}`}
+                  sx={{ width: 40, height: 40 }}
                 />
+
                 <LeftInfo>
                   {review.user}
-                  <span>{review.date}</span>
+                  <span style={{ color: "rgba(0,0,0,0.5)" }}>
+                    {review.date}
+                  </span>
                 </LeftInfo>
               </LeftRating>
               <RightRating>

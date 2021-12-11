@@ -12,7 +12,10 @@ const userSlice = createSlice({
     logout: (state) => {
       state.currentUser = null;
     },
+    updateUserAvatar: (state, action) => {
+      state.currentUser.avatarpath = action.payload;
+    },
   },
 });
-export const { login, logout } = userSlice.actions;
+export const { login, logout, updateUserAvatar } = userSlice.actions;
 export default userSlice.reducer;

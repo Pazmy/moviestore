@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Instance } from "../../helper/axios";
+import { formatter } from "../../helper/formatter";
 const Container = styled.div`
   padding: 20px 26px;
 `;
@@ -43,10 +44,34 @@ const Right = styled.div`
     }
   }
 `;
+const Section2 = styled.div``;
+const Card = styled.div`
+  display: flex;
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); */
+  flex-direction: column;
+  align-items: center;
+  flex-direction: wrap;
+  padding: 8px 16px 8px 0;
+  img {
+    border-radius: 10px;
+  }
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    span:first-child {
+      font-weight: 700;
+    }
+    span:last-child {
+      color: rgba(0, 0, 0, 0.5);
+    }
+  }
+`;
 
 const Actor = () => {
   const [actor, setActor] = useState({});
   const { id } = useParams();
+  console.log(actor.credits);
   useEffect(() => {
     Instance.get(`/actors/${id}`)
       .then((res) => {
@@ -84,6 +109,29 @@ const Actor = () => {
           </div>
         </Right>
       </Section1>
+      <Section2>
+        <h3>Credits</h3>
+        <div style={{ display: "flex", overflowX: "auto" }}>
+          {actor?.credits?.map((movie, i) => {
+            return (
+              <Card key={i}>
+                <Link to={`/movie/detail/${movie.id}`}>
+                  <img
+                    src={movie.poster}
+                    alt={movie.title}
+                    width="156"
+                    height="237"
+                  />
+                </Link>
+                <div className="bottom">
+                  <span>{movie.title}</span>
+                  <span>{formatter.format(movie.price)}</span>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </Section2>
     </Container>
   );
 };
