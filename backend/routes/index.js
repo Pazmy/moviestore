@@ -18,4 +18,7 @@ router.use("/comments", commentRoute);
 const orderRoute = require("./orderRoute");
 router.use("/orders", orderRoute);
 
+const stripeRoute = require("./stripeRoute");
+router.use("/stripe", stripeRoute);
+
 module.exports = router;

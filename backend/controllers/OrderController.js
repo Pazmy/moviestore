@@ -14,19 +14,25 @@ class OrderController {
   static async addOrder(req, res) {
     try {
       const { movies, quantity, total, user } = req.body;
-      const userResult = await User.findOne({ where: { email: user.email } });
-      const orderResult = await Order.create({
-        quantity,
-        total,
-        UserId: userResult.id,
-      });
-      await movies.forEach(async (movie) => {
-        await MovieOrder.create({
-          MovieId: movie.id,
-          OrderId: orderResult.id,
+      if (quantity != 0 && total !== 0) {
+        const userResult = await User.findOne({ where: { email: user.email } });
+        const orderResult = await Order.create({
+          quantity,
+          total,
+          UserId: userResult.id,
         });
-      });
-      res.status(201).json({ message: "Proceed success" });
+        await movies.forEach(async (movie) => {
+          await MovieOrder.create({
+            MovieId: movie.id,
+            OrderId: orderResult.id,
+          });
+        });
+        res
+          .status(201)
+          .json({ message: "Proceed success", orderName: orderResult.name });
+      } else {
+        res.status(400).json({ message: "Can't do that" });
+      }
     } catch (error) {
       res.status(500).json({ message: "Something went wrong", error });
     }
