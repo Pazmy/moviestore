@@ -18,11 +18,17 @@ const persistConfig = {
   version: 1,
   storage,
 };
+const persistConfig2 = {
+  key: "root2",
+  version: 1,
+  storage,
+};
 
 const persistedReducer = persistReducer(persistConfig, userReducer);
+const persistedReducer2 = persistReducer(persistConfig2, cartReducer);
 
 export const store = configureStore({
-  reducer: { cart: cartReducer, user: persistedReducer },
+  reducer: { cart: persistedReducer2, user: persistedReducer },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

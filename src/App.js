@@ -16,6 +16,7 @@ import Order from "./components/Pages/Order";
 import Footer from "./components/Footer/Footer";
 import UserInfo from "./components/Pages/UserInfo";
 import { SnackbarProvider } from "notistack";
+import Success from "./components/Pages/Success";
 
 function App() {
   const user = useSelector((state) => state.user.currentUser);
@@ -30,6 +31,7 @@ function App() {
       <SnackbarProvider maxSnack={3}>
         <Router>
           <Header user={user} />
+
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -42,6 +44,7 @@ function App() {
             <Route path="/actor/:id" element={<Actor />} />
             <Route path="/cart" element={<Cart user={user} />} />
             <Route path="/order" element={<Order user={user} />} />
+            <Route path="/success" element={<Success user={user} />} />
             <Route path="/user/info/:name" element={<UserInfo user={user} />} />
           </Routes>
           <Footer />

@@ -46,17 +46,6 @@ const Dropdown = styled.div`
   margin-right: 10px;
 `;
 const DropdownContent = styled.div`
-  /* display: block;
-  position: absolute;
-  min-width: 120px;
-
-  border: 1px solid #04aa6d;
-  border-radius: 7px;
-  transform: translateX(-40px);
-
-  .dropdown-child {
-    display: block;
-  } */
   position: absolute;
   display: none;
   min-width: 120px;
@@ -106,9 +95,6 @@ const Header = ({ user }) => {
       <Right>
         {user ? (
           <Dropdown>
-            {/* <IconButton color="primary" onClick={handleDropdown}>
-              <PersonIcon />
-            </IconButton> */}
             <Avatar
               alt={user?.name}
               src={`${SERVER_URL}/${user?.avatarpath}`}

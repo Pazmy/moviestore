@@ -7,7 +7,9 @@ import Loader from "../Loader/Loader";
 import { clearCart, removeProduct } from "../../redux/cartRedux";
 import { Instance } from "../../helper/axios";
 import Button from "@mui/material/Button";
-import { useSnackbar } from "notistack";
+import StripeCheckout from "react-stripe-checkout";
+
+const STRIPE_KEY = process.env.REACT_APP_STRIPE;
 
 const Container = styled.div`
   padding: 20px 26px;
@@ -56,7 +58,7 @@ const Cart = ({ user }) => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.cart.products);
   const quantity = useSelector((state) => state.cart.quantity);
-  const { enqueueSnackbar } = useSnackbar();
+  const [stripeToken, setStripeToken] = useState(null);
 
   let totalPrice = 0;
 
@@ -65,27 +67,43 @@ const Cart = ({ user }) => {
     if (!user) {
       navigate("/login");
     }
+    // const makePaymentReq= async() =>{
+    //   try {
+    //     const res = await Instance.post("/stripe/payment",{tokenId:stripeToken.id,amount:totalPrice*100})
+    //     navigate("/success",)
+    //   } catch (err) {
+
+    //   }
+    // }
     setLoading(false);
+
+    // stripeToken && makePaymentReq()
+    // stripeToken,totalPrice
   }, [navigate, user]);
-  function handleClick() {
-    setLoading(true);
+  async function handleClick() {
+    // setLoading(true);
+
     try {
       const data = { movies: products, quantity, total: totalPrice, user };
-      Instance.post(`/orders/add`, data).then((res) => {
-        dispatch(clearCart());
-        enqueueSnackbar(res.data.message, { variant: "success" });
-      });
-    } catch (err) {
-      if (err.response.data?.message) {
-        enqueueSnackbar(err.response.data.message, { variant: "error" });
-      }
-      console.log(err);
+      let StripeSuccessURL = await Instance.post("/stripe/payment", data).then(
+        (res) => {
+          return res.data.url;
+        }
+      );
+      window.location = StripeSuccessURL;
+    } catch (error) {
+      console.log(error.response);
     }
-    setLoading(false);
+    // setLoading(false);
   }
   function handleDeleteProduct(product, price) {
     dispatch(removeProduct({ product, price: price }));
   }
+  // function onToken(token) {
+  //   console.log(token);
+  //   setStripeToken(token);
+  // }
+  // console.log(stripeToken);
 
   if (loading) {
     return (
@@ -99,7 +117,7 @@ const Cart = ({ user }) => {
         <h1 style={{ marginBottom: "10px", fontWeight: "700" }}>Your Cart</h1>
         <Content>
           <ListCart>
-            {products.map((product, i) => {
+            {products?.map((product, i) => {
               totalPrice += product.price;
 
               return (
@@ -143,13 +161,23 @@ const Cart = ({ user }) => {
                 <p>TOTAL:</p>
                 <h2>{formatter.format(totalPrice)}</h2>
               </div>
+              {/* <StripeCheckout
+                billingAddress
+                currency="IDR"
+                name="Moviz Store"
+                amount={totalPrice * 100}
+                description={`Your total is ${formatter.format(totalPrice)}`}
+                token={onToken}
+                stripeKey={STRIPE_KEY}
+              > */}
               <Button
                 variant="contained"
                 onClick={handleClick}
-                disabled={products.length > 0 ? false : true}
+                disabled={products?.length > 0 ? false : true}
               >
                 PROCCEED TO CHECKOUT
               </Button>
+              {/* </StripeCheckout> */}
             </div>
           </Checkout>
         </Content>
