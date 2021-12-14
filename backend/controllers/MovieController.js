@@ -11,8 +11,20 @@ const {
 class MovieController {
   static async getAllMovies(req, res) {
     try {
-      const data = await Movie.findAll();
-      res.status(200).json({ results: data });
+      const page = req.query.page;
+      const limit = req.query.limit;
+      const startIndex = (page - 1) * limit;
+      // const endIndex = page * limit;
+      let totalPage = await Movie.count();
+      totalPage = Math.round(totalPage / limit);
+
+      const data = await Movie.findAll({
+        offset: startIndex,
+        limit: limit,
+        order: [["id", "ASC"]],
+      });
+
+      res.status(200).json({ results: data, totalPage });
     } catch (error) {
       res.status(500).json({ message: error });
     }
