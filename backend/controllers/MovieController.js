@@ -7,6 +7,7 @@ const {
   Comment,
   User,
 } = require("../models");
+const { Op } = require("sequelize");
 
 class MovieController {
   static async getAllMovies(req, res) {
@@ -22,6 +23,7 @@ class MovieController {
         offset: startIndex,
         limit: limit,
         order: [["id", "ASC"]],
+        where: { status: { [Op.or]: ["Released", "released"] } },
       });
 
       res.status(200).json({ results: data, totalPage });
@@ -29,9 +31,24 @@ class MovieController {
       res.status(500).json({ message: error });
     }
   }
+  static async getAllMoviesAdmin(req, res) {
+    try {
+      const data = await Movie.findAll({
+        order: [["id", "ASC"]],
+        where: { status: { [Op.or]: ["Released", "released"] } },
+      });
+
+      res.status(200).json({ results: data });
+    } catch (error) {
+      res.status(500).json({ message: error });
+    }
+  }
   static async getPopularMovies(req, res) {
     try {
-      const data = await Movie.findAll({ limit: 10 });
+      const data = await Movie.findAll({
+        limit: 10,
+        where: { status: "Released" || "released" },
+      });
       res.status(200).json({ results: data });
     } catch (error) {
       res.status(500).json({ message: error });
@@ -98,12 +115,21 @@ class MovieController {
         trailer,
         views,
         price,
-        poster,
         overview,
         status,
         genresId,
       } = req.body;
       const images = req.files;
+      let image = "";
+      let poster = "";
+      images.forEach((img) => {
+        console.log(img);
+        if (img.path.includes("poster")) {
+          poster = img.path;
+        } else if (img.path.includes("img")) {
+          image = img.path;
+        }
+      });
       if (!genresId) {
         res.status(400).json("Genre must be checked");
       }
@@ -120,11 +146,10 @@ class MovieController {
         trailer,
         views,
         price,
-        poster,
         overview,
         status,
-        poster: images[0].path,
-        image: images[1].path,
+        poster: `${process.env.SERVER_URL}/${poster}`,
+        image: `${process.env.SERVER_URL}/${image}`,
       });
 
       if (Array.isArray(genresId)) {
