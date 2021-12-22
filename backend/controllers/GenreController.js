@@ -45,6 +45,7 @@ class GenreController {
       let data = await MovieGenre.findAll({
         where: { GenreId: genre.id },
         include: [Movie, Genre],
+        order: [["id", "ASC"]],
       });
       let tempMovies = [];
       data = data.forEach((item) => {

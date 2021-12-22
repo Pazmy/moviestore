@@ -44,6 +44,7 @@ class OrderController {
       const userResult = await User.findOne({ where: { email } });
       let AllMovieOrders = await MovieOrder.findAll({
         include: [Movie, Order],
+        order: [["id", "ASC"]],
       });
       let filterMovieOrders = AllMovieOrders.filter((item) => {
         if (item.Order.UserId == userResult.id) {

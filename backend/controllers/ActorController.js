@@ -37,7 +37,7 @@ class ActorController {
         birthday,
         placeofbirth,
         biography,
-        image: image ? image.path : null,
+        image: image ? `${process.env.SERVER_URL}/${image.path}` : null,
       });
       await MovieActor.create({ MovieId, ActorId: actor.id, character });
       res.status(201).json({ message: "success" });
