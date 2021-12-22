@@ -51,6 +51,8 @@ class UserController {
     try {
       const userResult = await User.findOne({ where: { email } });
 
+      let library = [];
+
       if (userResult) {
         if (comparePwd(password, userResult.password)) {
           const token = generateAccessToken({
@@ -58,6 +60,26 @@ class UserController {
             name: userResult.name,
             role: userResult.role,
           });
+          const isAlreadyOrder = await Order.findOne({
+            where: { UserId: userResult.id },
+          });
+
+          if (isAlreadyOrder) {
+            const temp = [];
+            let AllMovieOrders = await MovieOrder.findAll({
+              include: [Movie, Order],
+            });
+
+            AllMovieOrders.forEach((item) => {
+              if (item.Order.UserId == userResult.id) {
+                temp.push({
+                  movieId: item.MovieId,
+                  movieName: item.Movie.title,
+                });
+              }
+            });
+            library = temp;
+          }
 
           res.status(200).json({
             token,
@@ -65,6 +87,7 @@ class UserController {
             avatarpath: userResult.avatarpath,
             name: userResult.name,
             role: userResult.role,
+            library,
           });
         } else {
           throw { message: "Email or password is not correct" };
