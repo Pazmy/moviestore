@@ -60,9 +60,16 @@ const Login = () => {
         email,
         password,
       });
-      const { name, role, token, avatarpath } = response.data;
+      const { name, role, token, avatarpath, library } = response.data;
       dispatch(
-        login({ name, email: response.data.email, role, token, avatarpath })
+        login({
+          name,
+          email: response.data.email,
+          role,
+          token,
+          avatarpath,
+          library,
+        })
       );
       setLoading(false);
       navigate("/");
