@@ -7,6 +7,8 @@ import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import Loader from "../Loader/Loader";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 
 const Container = styled.div`
   padding: 20px 26px;
@@ -23,27 +25,44 @@ const Left = styled.div`
 const Right = styled.div`
   flex: 1;
   margin-left: 20px;
-  display: grid;
+  /* display: grid;
   grid-template-columns: repeat(auto-fill, minmax(156px, 156px));
   grid-column-gap: 8px;
   grid-row-gap: 16px;
-  grid-template-rows: repeat(auto-fill, 1fr);
+  grid-template-rows: repeat(auto-fill, 1fr); */
+  display: flex;
+  /* justify-content: space-between; */
+  flex-wrap: wrap;
+  gap: 15px 20px;
 `;
 const Card = styled.div`
   display: flex;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   height: auto;
   max-height: 350px;
+  max-width: 159px;
   flex-direction: column;
   img {
     border-radius: 10px 10px 0 0;
+    width: 100%;
   }
   .bottom {
-    display: flex;
-    flex-direction: column;
+    /* flex: 1; */
+    width: 100%;
+    /* display: flex;
+    flex-wrap: wrap; */
+    display: grid;
+    grid-template-rows: repeat(auto-fill, 1fr);
+    overflow: hidden;
+    row-gap: 5px;
     padding: 8px 12px;
+
     span:first-child {
+      width: 100%;
       font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      overflow-wrap: break-word;
     }
     span:last-child {
       color: rgba(0, 0, 0, 0.5);
@@ -93,11 +112,15 @@ const Movies = () => {
   const [activeGenre, setActiveGenre] = useState([]);
   // const [noResult, setNoResult] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(10);
+  const [hidePgn, setHidePgn] = useState(false);
 
   useEffect(() => {
-    Instance.get("/movies/")
+    Instance.get(`/movies/?page=${page}&limit=10`)
       .then((res) => {
         setMovies(res.data.results);
+        setTotalPage(res.data.totalPage);
       })
       .catch((err) => console.log(err.response?.data));
     Instance.get("/genres/")
@@ -106,7 +129,8 @@ const Movies = () => {
       })
       .catch((err) => console.log(err.response?.data));
     setLoading(false);
-  }, []);
+  }, [page]);
+
   function handlerPickGenre(e, genre) {
     //pick only one genre for now
     e.target.classList.toggle("active");
@@ -129,16 +153,19 @@ const Movies = () => {
   }
   function handlerFilterSearch() {
     if (activeGenre.length === 0) {
-      Instance.get("/movies/")
+      Instance.get(`/movies/?page=${page}&limit=10`)
         .then((res) => {
           setMovies(res.data.results);
         })
         .catch((err) => console.log(err.response?.data));
+      setHidePgn(false);
     } else {
       setLoading(true);
       console.log(activeGenre);
       if (activeGenre.length > 0) {
-        Instance.post("/genres/filter", { genres: activeGenre })
+        Instance.post(`/genres/filter`, {
+          genres: activeGenre,
+        })
           .then((res) => {
             let results = res.data.results;
             if (results.length > 0) {
@@ -152,7 +179,11 @@ const Movies = () => {
           .catch((err) => console.log(err.response));
       }
       setLoading(false);
+      setHidePgn(true);
     }
+  }
+  function handlePage(e, value) {
+    setPage(value);
   }
   if (loading) {
     return (
@@ -213,7 +244,7 @@ const Movies = () => {
                     />
                   </Link>
                   <div className="bottom">
-                    <span>{movie?.title}</span>
+                    <span className="title">{movie?.title}</span>
                     <span>{formatter.format(movie?.price)}</span>
                   </div>
                 </Card>
@@ -221,6 +252,17 @@ const Movies = () => {
             })}
           </Right>
         </Content>
+        <Stack
+          spacing={2}
+          direction="row"
+          sx={{ display: "flex", justifyContent: "center", marginTop: "30px" }}
+        >
+          {hidePgn ? (
+            ""
+          ) : (
+            <Pagination count={totalPage} page={page} onChange={handlePage} />
+          )}
+        </Stack>
       </Container>
     );
   }
