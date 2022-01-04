@@ -15,7 +15,13 @@ const userSlice = createSlice({
     updateUserAvatar: (state, action) => {
       state.currentUser.avatarpath = action.payload;
     },
+    updateLibrary: (state, action) => {
+      action.payload.forEach((data) => {
+        state.currentUser.library.push(data);
+      });
+    },
   },
 });
-export const { login, logout, updateUserAvatar } = userSlice.actions;
+export const { login, logout, updateUserAvatar, updateLibrary } =
+  userSlice.actions;
 export default userSlice.reducer;

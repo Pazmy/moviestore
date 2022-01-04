@@ -85,22 +85,28 @@ const Actor = styled.div`
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   max-width: 138px;
   min-width: 138px;
+
   img {
     display: block;
     width: 100%;
-
+    max-width: 138px;
     height: auto;
     object-fit: cover;
     border-radius: 10px 10px 0 0;
   }
   div {
+    flex: 1;
     display: flex;
     flex-flow: wrap column;
     padding: 8px 12px;
+    width: 100%;
 
     span.name {
+      width: 100%;
       font-weight: 700;
       font-size: 18px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;
@@ -179,6 +185,8 @@ const DetailMovie = ({ user }) => {
   const [checkout, setCheckout] = useState(false);
   const dispatch = useDispatch();
   const products = useSelector((state) => state.cart.products);
+  const library = useSelector((state) => state.user?.currentUser?.library);
+  const [bought, setBought] = useState(false);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -189,6 +197,15 @@ const DetailMovie = ({ user }) => {
         let alreadyInCart = products.find((item) => {
           return item.id === res.data.result.id;
         });
+
+        if (library) {
+          let isInLibrary = library.find((item) => {
+            return item.movieId === res.data.result.id;
+          });
+          if (isInLibrary) {
+            setBought(true);
+          }
+        }
         if (alreadyInCart) setCheckout(true);
         setActors(res.data.result.actors);
         setReviews(res.data.result.comments);
@@ -197,7 +214,7 @@ const DetailMovie = ({ user }) => {
       .catch((err) => {
         console.log(err.response?.data);
       });
-  }, [id, products]);
+  }, [id, products, library]);
   function handleSubmit(e) {
     e.preventDefault();
     Instance.post("/comments/add", {
@@ -261,17 +278,23 @@ const DetailMovie = ({ user }) => {
             <span style={{ marginBottom: "10px" }}>
               {formatter.format(movie.price)}
             </span>
-            <AddToCart>
-              {checkout ? (
-                <Button variant="contained">
-                  <Link to="/cart">Checkout Now</Link>
-                </Button>
-              ) : (
-                <Button variant="contained" onClick={handleClick}>
-                  Add To Cart <ShoppingCartIcon />
-                </Button>
-              )}
-            </AddToCart>
+            {bought ? (
+              <AddToCart>
+                <Button variant="contained">Already Bought</Button>
+              </AddToCart>
+            ) : (
+              <AddToCart>
+                {checkout ? (
+                  <Button variant="contained">
+                    <Link to="/cart">Checkout Now</Link>
+                  </Button>
+                ) : (
+                  <Button variant="contained" onClick={handleClick}>
+                    Add To Cart <ShoppingCartIcon />
+                  </Button>
+                )}
+              </AddToCart>
+            )}
           </Text>
         </Content>
       </Section1>
@@ -307,7 +330,7 @@ const DetailMovie = ({ user }) => {
         </ActorsWrapper>
       </Section2>
       <Section3>
-        <h3>Review</h3>
+        <h3>Review({reviews?.length > 0 ? reviews?.length : 0})</h3>
         {user ? (
           <WriteReview>
             <LeftRating>

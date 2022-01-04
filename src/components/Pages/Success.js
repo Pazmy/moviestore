@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Instance } from "../../helper/axios";
 import { clearCart } from "../../redux/cartRedux";
+import { updateLibrary } from "../../redux/userRedux";
 import { useSnackbar } from "notistack";
 import Button from "@mui/material/Button";
 
@@ -26,9 +27,13 @@ const Success = ({ user }) => {
       try {
         const data = { movies: products, quantity, total: total, user };
         Instance.post(`/orders/add`, data).then((res) => {
+          let library = data.movies.map((movie) => {
+            return { movieId: movie.id, movieName: movie.title };
+          });
+          dispatch(updateLibrary(library));
           dispatch(clearCart());
           setOrderName(res.data?.orderName);
-          isPlaced.current = false;
+
           enqueueSnackbar(res.data.message, { variant: "success" });
         });
       } catch (err) {
@@ -37,8 +42,13 @@ const Success = ({ user }) => {
         }
         console.log(err);
       }
+      isPlaced.current = true;
     };
-    !isPlaced.current && makeRequest();
+    if (isPlaced.current === false) {
+      console.log(isPlaced.current);
+      makeRequest();
+      console.log(isPlaced.current);
+    }
   }, [
     dispatch,
     products,
@@ -62,8 +72,12 @@ const Success = ({ user }) => {
       {orderName
         ? `Order has been created successfully. Your order number is ${orderName}`
         : `Successfull. Your order is being prepared...`}
-      <Button variant="contained" sx={{ marginTop: "20px" }}>
-        Go to Homepage
+      <Button
+        variant="contained"
+        sx={{ marginTop: "20px" }}
+        onClick={() => navigate("/")}
+      >
+        go to homepage
       </Button>
     </div>
   );
