@@ -59,20 +59,20 @@ const UserInfo = ({ user }) => {
     <Container>
       <Content>
         <div>
+          {/* <h3>Avatar</h3> */}
+          <Avatar
+            alt={user?.name}
+            src={`${SERVER_URL}/${user?.avatarpath}`}
+            sx={{ maxWidth: 150, width: 100, minHeight: 100, height: "auto" }}
+          />
+        </div>
+        <div>
           <h3>Name:</h3>
           <span>{user.name}</span>
         </div>
         <div>
           <h3>Email:</h3>
           <span>{user.email}</span>
-        </div>
-        <div style={{ display: "flex" }}>
-          <h3>Avatar</h3>
-          <Avatar
-            alt={user?.name}
-            src={`${SERVER_URL}/${user?.avatarpath}`}
-            sx={{ width: 28, height: 28 }}
-          />
         </div>
         <form onSubmit={handleSubmit}>
           <label>Change Avatar?</label>

@@ -50,7 +50,7 @@ const Order = ({ user }) => {
             <th>No</th>
             <th className="">Order Name</th>
             <th>Items</th>
-            <th className="">Status</th>
+            {/* <th className="">Status</th> */}
             <th className="">Date</th>
             <th className="">Total</th>
           </tr>
@@ -68,7 +68,7 @@ const Order = ({ user }) => {
                     ))}
                   </ul>
                 </td>
-                <td>{order.orderDetail.status}</td>
+                {/* <td>{order.orderDetail.status}</td> */}
 
                 <td>
                   {new Date(order.orderDetail.createdAt)
